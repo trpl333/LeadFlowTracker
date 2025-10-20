@@ -22,8 +22,8 @@ export default function Dashboard() {
   });
 
   const addLeadMutation = useMutation({
-    mutationFn: async (lead: InsertLead) => {
-      return apiRequest("POST", "/api/leads", lead);
+    mutationFn: async (lead: InsertLead): Promise<void> => {
+      await apiRequest("POST", "/api/leads", lead);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/leads"] });

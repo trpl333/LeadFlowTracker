@@ -13,8 +13,8 @@ const progressMilestones = leadStages.filter(s => s !== "Lost");
 
 export function MilestoneProgress({ lead, onMilestoneToggle }: MilestoneProgressProps) {
   const completedMilestones = lead.completedMilestones || [];
-  const currentStageIndex = progressMilestones.indexOf(lead.currentStage as LeadStage);
   const isLost = lead.currentStage === "Lost";
+  const currentStageIndex = isLost ? -1 : progressMilestones.indexOf(lead.currentStage as Exclude<LeadStage, "Lost">);
   
   const progressPercentage = isLost 
     ? 0 
