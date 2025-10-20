@@ -1,6 +1,8 @@
-import { type Lead, type InsertLead, leadStages, type LeadStage } from "@shared/schema";
+import { type Lead, type InsertLead, leadStages, type LeadStage, leads } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { syncLeadToSheet, syncAllLeadsToSheet } from "./sheetService";
+import { db } from "./db";
+import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
   getAllLeads(): Promise<Lead[]>;
@@ -12,30 +14,21 @@ export interface IStorage {
   reactivateLead(id: string): Promise<Lead>;
 }
 
-export class MemStorage implements IStorage {
-  private leads: Map<string, Lead>;
-
-  constructor() {
-    this.leads = new Map();
-  }
-
+export class DbStorage implements IStorage {
   async getAllLeads(): Promise<Lead[]> {
-    return Array.from(this.leads.values()).sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+    return await db.select().from(leads).orderBy(desc(leads.createdAt));
   }
 
   async getLeadById(id: string): Promise<Lead | undefined> {
-    return this.leads.get(id);
+    const result = await db.select().from(leads).where(eq(leads.id, id));
+    return result[0];
   }
 
   async createLead(insertLead: InsertLead): Promise<Lead> {
-    const id = randomUUID();
     const now = new Date();
     
-    const lead: Lead = {
+    const newLead = {
       ...insertLead,
-      id,
       currentStage: "First Contact",
       completedMilestones: [],
       notes: insertLead.notes || "",
@@ -44,7 +37,8 @@ export class MemStorage implements IStorage {
       stageEnteredAt: now,
     };
     
-    this.leads.set(id, lead);
+    const result = await db.insert(leads).values(newLead).returning();
+    const lead = result[0];
     
     try {
       await syncLeadToSheet(lead);
@@ -56,18 +50,18 @@ export class MemStorage implements IStorage {
   }
 
   async updateLead(id: string, updates: Partial<Lead>): Promise<Lead> {
-    const existingLead = this.leads.get(id);
+    const existingLead = await this.getLeadById(id);
     if (!existingLead) {
       throw new Error("Lead not found");
     }
 
-    const updatedLead: Lead = {
-      ...existingLead,
-      ...updates,
-      updatedAt: new Date(),
-    };
-
-    this.leads.set(id, updatedLead);
+    const result = await db
+      .update(leads)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(leads.id, id))
+      .returning();
+    
+    const updatedLead = result[0];
     
     try {
       await syncLeadToSheet(updatedLead);
@@ -79,7 +73,7 @@ export class MemStorage implements IStorage {
   }
 
   async toggleMilestone(id: string, milestone: LeadStage): Promise<Lead> {
-    const lead = this.leads.get(id);
+    const lead = await this.getLeadById(id);
     if (!lead) {
       throw new Error("Lead not found");
     }
@@ -125,7 +119,7 @@ export class MemStorage implements IStorage {
   }
 
   async markAsLost(id: string): Promise<Lead> {
-    const lead = this.leads.get(id);
+    const lead = await this.getLeadById(id);
     if (!lead) {
       throw new Error("Lead not found");
     }
@@ -137,7 +131,7 @@ export class MemStorage implements IStorage {
   }
 
   async reactivateLead(id: string): Promise<Lead> {
-    const lead = this.leads.get(id);
+    const lead = await this.getLeadById(id);
     if (!lead) {
       throw new Error("Lead not found");
     }
@@ -173,4 +167,4 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DbStorage();
