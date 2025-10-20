@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
-import { Users, TrendingUp, CheckCircle2, XCircle, Search, Calendar } from "lucide-react";
+import { Users, TrendingUp, CheckCircle2, XCircle, Search, Calendar, Trash2 } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SyncStatus } from "@/components/sync-status";
 import { AddLeadDialog } from "@/components/add-lead-dialog";
@@ -12,10 +12,29 @@ import { EmptyState } from "@/components/empty-state";
 import { AnalyticsSection } from "@/components/analytics-section";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import type { Lead, InsertLead, LeadStage } from "@shared/schema";
+import { leadStages } from "@shared/schema";
 import { format } from "date-fns";
 
 export default function Dashboard() {
@@ -23,6 +42,8 @@ export default function Dashboard() {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [dateRange, setDateRange] = useState<{ from?: Date; to?: Date }>({});
+  const [selectedLeads, setSelectedLeads] = useState<Set<string>>(new Set());
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { toast } = useToast();
 
   const { data: leads = [], isLoading } = useQuery<Lead[]>({
@@ -104,6 +125,129 @@ export default function Dashboard() {
       });
     },
   });
+
+  const bulkMarkAsLostMutation = useMutation({
+    mutationFn: async (leadIds: string[]) => {
+      await Promise.all(
+        leadIds.map(id => apiRequest("POST", `/api/leads/${id}/mark-lost`, {}))
+      );
+    },
+    onSuccess: (_, leadIds) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/leads"] });
+      setSelectedLeads(new Set());
+      toast({
+        title: "Bulk action completed",
+        description: `${leadIds.length} ${leadIds.length === 1 ? "lead" : "leads"} marked as lost.`,
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to complete bulk action. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (leadIds: string[]) => {
+      await Promise.all(
+        leadIds.map(id => apiRequest("DELETE", `/api/leads/${id}`))
+      );
+    },
+    onSuccess: (_, leadIds) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/leads"] });
+      setSelectedLeads(new Set());
+      setDeleteDialogOpen(false);
+      toast({
+        title: "Leads deleted",
+        description: `${leadIds.length} ${leadIds.length === 1 ? "lead" : "leads"} permanently deleted.`,
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete leads. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const bulkUpdateStageMutation = useMutation({
+    mutationFn: async ({ leadIds, stage }: { leadIds: string[]; stage: LeadStage }) => {
+      await Promise.all(
+        leadIds.map(id => apiRequest("PATCH", `/api/leads/${id}/stage`, { stage }))
+      );
+    },
+    onSuccess: (_, { leadIds }) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/leads"] });
+      setSelectedLeads(new Set());
+      toast({
+        title: "Stage updated",
+        description: `${leadIds.length} ${leadIds.length === 1 ? "lead" : "leads"} updated.`,
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update stages. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const toggleLeadSelection = (leadId: string) => {
+    setSelectedLeads(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(leadId)) {
+        newSet.delete(leadId);
+      } else {
+        newSet.add(leadId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedLeads.size === filteredLeads.length) {
+      setSelectedLeads(new Set());
+    } else {
+      setSelectedLeads(new Set(filteredLeads.map(l => l.id)));
+    }
+  };
+
+  const handleBulkMarkAsLost = () => {
+    if (selectedLeads.size === 0) return;
+    const canMarkAsLost = Array.from(selectedLeads).every(id => {
+      const lead = leads.find(l => l.id === id);
+      return lead && lead.currentStage !== "Closed/Bound" && lead.currentStage !== "Lost";
+    });
+    
+    if (!canMarkAsLost) {
+      toast({
+        title: "Invalid selection",
+        description: "Cannot mark closed or already lost leads as lost.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    bulkMarkAsLostMutation.mutate(Array.from(selectedLeads));
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedLeads.size === 0) return;
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmBulkDelete = () => {
+    bulkDeleteMutation.mutate(Array.from(selectedLeads));
+  };
+
+  const handleBulkStageChange = (stage: LeadStage) => {
+    if (selectedLeads.size === 0) return;
+    bulkUpdateStageMutation.mutate({ leadIds: Array.from(selectedLeads), stage });
+  };
 
   const filteredLeads = useMemo(() => {
     return leads.filter(lead => {
@@ -311,23 +455,110 @@ export default function Dashboard() {
                 </div>
               )
             ) : (
-              <div className="grid grid-cols-1 gap-4" data-testid="container-leads-list">
-                {filteredLeads.map((lead) => (
-                  <LeadCard
-                    key={lead.id}
-                    lead={lead}
-                    onMilestoneToggle={(leadId, milestone) =>
-                      toggleMilestoneMutation.mutate({ leadId, milestone })
-                    }
-                    onMarkAsLost={(leadId) => markAsLostMutation.mutate(leadId)}
-                    onReactivate={(leadId) => reactivateMutation.mutate(leadId)}
-                  />
-                ))}
-              </div>
+              <>
+                {filteredLeads.length > 0 && (
+                  <div className="flex items-center justify-between gap-4 p-3 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Checkbox
+                        checked={selectedLeads.size === filteredLeads.length && filteredLeads.length > 0}
+                        onCheckedChange={toggleSelectAll}
+                        data-testid="checkbox-select-all"
+                      />
+                      <span className="text-sm text-muted-foreground">
+                        {selectedLeads.size > 0 
+                          ? `${selectedLeads.size} selected` 
+                          : `Select all ${filteredLeads.length}`}
+                      </span>
+                    </div>
+                    {selectedLeads.size > 0 && (
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Select onValueChange={(value) => handleBulkStageChange(value as LeadStage)}>
+                          <SelectTrigger className="w-[180px]" data-testid="select-bulk-stage">
+                            <SelectValue placeholder="Change stage..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {leadStages.filter(s => s !== "Lost").map((stage) => (
+                              <SelectItem key={stage} value={stage}>
+                                {stage}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleBulkMarkAsLost}
+                          disabled={bulkMarkAsLostMutation.isPending}
+                          className="gap-1.5 text-destructive border-destructive/30 hover:bg-destructive/10"
+                          data-testid="button-bulk-mark-lost"
+                        >
+                          <XCircle className="h-3.5 w-3.5" />
+                          Mark as Lost
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleBulkDelete}
+                          disabled={bulkDeleteMutation.isPending}
+                          className="gap-1.5 text-destructive border-destructive/30 hover:bg-destructive/10"
+                          data-testid="button-bulk-delete"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                          Delete
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedLeads(new Set())}
+                          data-testid="button-clear-selection"
+                        >
+                          Clear
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+                <div className="grid grid-cols-1 gap-4" data-testid="container-leads-list">
+                  {filteredLeads.map((lead) => (
+                    <LeadCard
+                      key={lead.id}
+                      lead={lead}
+                      selected={selectedLeads.has(lead.id)}
+                      onToggleSelect={toggleLeadSelection}
+                      onMilestoneToggle={(leadId, milestone) =>
+                        toggleMilestoneMutation.mutate({ leadId, milestone })
+                      }
+                      onMarkAsLost={(leadId) => markAsLostMutation.mutate(leadId)}
+                      onReactivate={(leadId) => reactivateMutation.mutate(leadId)}
+                    />
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </div>
       </main>
+      
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete leads permanently?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete {selectedLeads.size} {selectedLeads.size === 1 ? "lead" : "leads"} from the database.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-delete">Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmBulkDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="button-confirm-delete"
+            >
+              Delete permanently
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

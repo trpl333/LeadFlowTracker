@@ -12,6 +12,7 @@ export interface IStorage {
   toggleMilestone(id: string, milestone: LeadStage): Promise<Lead>;
   markAsLost(id: string): Promise<Lead>;
   reactivateLead(id: string): Promise<Lead>;
+  deleteLead(id: string): Promise<void>;
 }
 
 export class DbStorage implements IStorage {
@@ -172,6 +173,15 @@ export class DbStorage implements IStorage {
       currentStage: leadStages[0],
       stageEnteredAt: new Date(),
     });
+  }
+
+  async deleteLead(id: string): Promise<void> {
+    const lead = await this.getLeadById(id);
+    if (!lead) {
+      throw new Error("Lead not found");
+    }
+
+    await db.delete(leads).where(eq(leads.id, id));
   }
 }
 

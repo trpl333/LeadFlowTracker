@@ -104,6 +104,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/leads/:id/stage", async (req, res) => {
+    try {
+      const { stage } = req.body;
+      if (!stage) {
+        return res.status(400).json({ error: "Stage is required" });
+      }
+      
+      const lead = await storage.updateLead(req.params.id, { 
+        currentStage: stage,
+        stageEnteredAt: new Date()
+      });
+      res.json(lead);
+    } catch (error) {
+      if (error instanceof Error && error.message === "Lead not found") {
+        return res.status(404).json({ error: "Lead not found" });
+      }
+      console.error("Error updating stage:", error);
+      res.status(500).json({ error: "Failed to update stage" });
+    }
+  });
+
+  app.delete("/api/leads/:id", async (req, res) => {
+    try {
+      await storage.deleteLead(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      if (error instanceof Error && error.message === "Lead not found") {
+        return res.status(404).json({ error: "Lead not found" });
+      }
+      console.error("Error deleting lead:", error);
+      res.status(500).json({ error: "Failed to delete lead" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

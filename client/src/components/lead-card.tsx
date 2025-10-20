@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ChevronDown, ChevronUp, Mail, Phone, Building2, Flag, XCircle, RotateCcw } from "lucide-react";
 import { StageBadge } from "./stage-badge";
 import { MilestoneProgress } from "./milestone-progress";
@@ -19,9 +20,11 @@ type LeadCardProps = {
   onMilestoneToggle: (leadId: string, milestone: LeadStage) => void;
   onMarkAsLost: (leadId: string) => void;
   onReactivate: (leadId: string) => void;
+  selected?: boolean;
+  onToggleSelect?: (leadId: string) => void;
 };
 
-export function LeadCard({ lead, onMilestoneToggle, onMarkAsLost, onReactivate }: LeadCardProps) {
+export function LeadCard({ lead, onMilestoneToggle, onMarkAsLost, onReactivate, selected, onToggleSelect }: LeadCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [notes, setNotes] = useState(lead.notes);
   const { toast } = useToast();
@@ -71,21 +74,31 @@ export function LeadCard({ lead, onMilestoneToggle, onMarkAsLost, onReactivate }
       <CardContent className="p-4">
         <div className="space-y-4">
           <div className="flex items-start justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-semibold text-base truncate" data-testid={`text-lead-name-${lead.id}`}>
-                  {lead.name}
-                </h3>
-                {isOverdue && (
-                  <Badge variant="outline" className="gap-1 border-destructive/30 bg-destructive/10 text-destructive">
-                    <Flag className="h-3 w-3" />
-                    Overdue
-                  </Badge>
-                )}
-              </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Building2 className="h-3.5 w-3.5" />
-                <span className="truncate" data-testid={`text-lead-company-${lead.id}`}>{lead.company}</span>
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              {onToggleSelect && (
+                <Checkbox
+                  checked={selected}
+                  onCheckedChange={() => onToggleSelect(lead.id)}
+                  data-testid={`checkbox-select-${lead.id}`}
+                  className="shrink-0"
+                />
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-semibold text-base truncate" data-testid={`text-lead-name-${lead.id}`}>
+                    {lead.name}
+                  </h3>
+                  {isOverdue && (
+                    <Badge variant="outline" className="gap-1 border-destructive/30 bg-destructive/10 text-destructive">
+                      <Flag className="h-3 w-3" />
+                      Overdue
+                    </Badge>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Building2 className="h-3.5 w-3.5" />
+                  <span className="truncate" data-testid={`text-lead-company-${lead.id}`}>{lead.company}</span>
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-2">
