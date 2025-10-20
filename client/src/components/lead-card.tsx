@@ -1,12 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import { ChevronDown, ChevronUp, Mail, Phone, Building2, Flag, XCircle, RotateCcw } from "lucide-react";
 import { StageBadge } from "./stage-badge";
 import { MilestoneProgress } from "./milestone-progress";
 import type { Lead, LeadStage } from "@shared/schema";
 import { formatDistanceToNow } from "date-fns";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 type LeadCardProps = {
   lead: Lead;
@@ -17,6 +21,12 @@ type LeadCardProps = {
 
 export function LeadCard({ lead, onMilestoneToggle, onMarkAsLost, onReactivate }: LeadCardProps) {
   const [expanded, setExpanded] = useState(false);
+  const [notes, setNotes] = useState(lead.notes);
+  const { toast } = useToast();
+  
+  useEffect(() => {
+    setNotes(lead.notes);
+  }, [lead.notes]);
   
   const daysInStage = Math.floor(
     (new Date().getTime() - new Date(lead.stageEnteredAt).getTime()) / (1000 * 60 * 60 * 24)
@@ -26,6 +36,33 @@ export function LeadCard({ lead, onMilestoneToggle, onMarkAsLost, onReactivate }
   const isLost = lead.currentStage === "Lost";
   const isClosed = lead.currentStage === "Closed/Bound";
   const canMarkAsLost = !isLost && !isClosed;
+
+  const updateNotesMutation = useMutation({
+    mutationFn: async (newNotes: string) => {
+      return await apiRequest("PATCH", `/api/leads/${lead.id}/notes`, { notes: newNotes });
+    },
+    onSuccess: (updatedLead) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/leads"] });
+      setNotes(updatedLead.notes);
+      toast({
+        title: "Notes updated",
+        description: "Lead notes have been saved.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update notes. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleNotesBlur = () => {
+    if (notes !== lead.notes) {
+      updateNotesMutation.mutate(notes);
+    }
+  };
 
   return (
     <Card className="hover-elevate" data-testid={`card-lead-${lead.id}`}>
@@ -138,12 +175,20 @@ export function LeadCard({ lead, onMilestoneToggle, onMarkAsLost, onReactivate }
                 <span data-testid={`text-source-${lead.id}`}>{lead.source}</span>
               </div>
               
-              {lead.notes && (
-                <div className="text-sm">
-                  <span className="text-muted-foreground">Notes:</span>{" "}
-                  <p className="mt-1 text-foreground/90" data-testid={`text-notes-${lead.id}`}>{lead.notes}</p>
-                </div>
-              )}
+              <div className="space-y-2">
+                <label htmlFor={`notes-${lead.id}`} className="text-sm text-muted-foreground">
+                  Notes
+                </label>
+                <Textarea
+                  id={`notes-${lead.id}`}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  onBlur={handleNotesBlur}
+                  placeholder="Add call summaries, client details, or follow-up reminders..."
+                  className="resize-none min-h-[80px]"
+                  data-testid={`textarea-notes-${lead.id}`}
+                />
+              </div>
             </div>
           )}
         </div>

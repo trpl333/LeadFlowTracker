@@ -86,6 +86,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/leads/:id/notes", async (req, res) => {
+    try {
+      const { notes } = req.body;
+      if (typeof notes !== "string") {
+        return res.status(400).json({ error: "Notes must be a string" });
+      }
+      
+      const lead = await storage.updateLead(req.params.id, { notes });
+      res.json(lead);
+    } catch (error) {
+      if (error instanceof Error && error.message === "Lead not found") {
+        return res.status(404).json({ error: "Lead not found" });
+      }
+      console.error("Error updating notes:", error);
+      res.status(500).json({ error: "Failed to update notes" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;
