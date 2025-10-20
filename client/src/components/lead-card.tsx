@@ -3,9 +3,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
 import { ChevronDown, ChevronUp, Mail, Phone, Building2, Flag, XCircle, RotateCcw } from "lucide-react";
 import { StageBadge } from "./stage-badge";
 import { MilestoneProgress } from "./milestone-progress";
+import { MilestoneTimeline } from "./milestone-timeline";
 import type { Lead, LeadStage } from "@shared/schema";
 import { formatDistanceToNow } from "date-fns";
 import { useMutation } from "@tanstack/react-query";
@@ -187,6 +189,16 @@ export function LeadCard({ lead, onMilestoneToggle, onMarkAsLost, onReactivate }
                   placeholder="Add call summaries, client details, or follow-up reminders..."
                   className="resize-none min-h-[80px]"
                   data-testid={`textarea-notes-${lead.id}`}
+                />
+              </div>
+
+              <Separator />
+
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium">Milestone History</h4>
+                <MilestoneTimeline 
+                  milestoneHistory={lead.milestoneHistory || []} 
+                  currentStage={lead.currentStage as LeadStage}
                 />
               </div>
             </div>

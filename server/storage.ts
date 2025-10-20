@@ -83,15 +83,18 @@ export class DbStorage implements IStorage {
     }
 
     const completedMilestones = lead.completedMilestones || [];
+    const milestoneHistory = lead.milestoneHistory || [];
     const milestoneIndex = leadStages.indexOf(milestone);
     
     const isCompleted = completedMilestones.includes(milestone);
 
     let newCompletedMilestones: string[];
     let newCurrentStage: string;
+    let newMilestoneHistory = [...milestoneHistory];
 
     if (isCompleted) {
       newCompletedMilestones = completedMilestones.filter(m => m !== milestone);
+      newMilestoneHistory = milestoneHistory.filter(h => h.stage !== milestone);
       
       const progressMilestones = leadStages.filter(s => s !== "Lost");
       const previousMilestones = progressMilestones.slice(0, milestoneIndex);
@@ -101,6 +104,10 @@ export class DbStorage implements IStorage {
       newCurrentStage = lastCompleted || leadStages[0];
     } else {
       newCompletedMilestones = [...completedMilestones, milestone];
+      newMilestoneHistory.push({
+        stage: milestone,
+        completedAt: new Date().toISOString(),
+      });
       
       const progressMilestones = leadStages.filter(s => s !== "Lost");
       const nextMilestoneIndex = progressMilestones.indexOf(milestone) + 1;
@@ -113,6 +120,7 @@ export class DbStorage implements IStorage {
 
     return this.updateLead(id, {
       completedMilestones: newCompletedMilestones,
+      milestoneHistory: newMilestoneHistory,
       currentStage: newCurrentStage,
       stageEnteredAt: newCurrentStage !== lead.currentStage ? new Date() : lead.stageEnteredAt,
     });

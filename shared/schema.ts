@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -15,6 +15,11 @@ export const leadStages = [
 
 export type LeadStage = typeof leadStages[number];
 
+export type MilestoneHistory = {
+  stage: LeadStage;
+  completedAt: string;
+}[];
+
 export const leads = pgTable("leads", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
@@ -24,6 +29,7 @@ export const leads = pgTable("leads", {
   source: text("source").notNull(),
   currentStage: text("current_stage").notNull().default("First Contact"),
   completedMilestones: text("completed_milestones").array().notNull().default(sql`ARRAY[]::text[]`),
+  milestoneHistory: jsonb("milestone_history").$type<MilestoneHistory>().default(sql`'[]'::jsonb`),
   notes: text("notes").default(""),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
