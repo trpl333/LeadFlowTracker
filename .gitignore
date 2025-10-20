@@ -4,3 +4,21 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log
+/tmp/
+
+# Replit specific
+.replit
+.upm/
+.cache/
+.config/
+replit.nix
+
+# Setup scripts
+setup-github.js
