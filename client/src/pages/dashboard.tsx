@@ -9,6 +9,7 @@ import { LeadCard } from "@/components/lead-card";
 import { StatsCard } from "@/components/stats-card";
 import { FilterTabs } from "@/components/filter-tabs";
 import { EmptyState } from "@/components/empty-state";
+import { AnalyticsSection } from "@/components/analytics-section";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -206,6 +207,10 @@ export default function Dashboard() {
               description={`${stats.closed} closed, ${stats.lost} lost`}
             />
           </div>
+
+          {leads.length > 0 && (
+            <AnalyticsSection leads={leads} />
+          )}
 
           <div className="space-y-4">
             <FilterTabs
