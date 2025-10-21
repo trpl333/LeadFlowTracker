@@ -1,0 +1,202 @@
+root@chatbot-server:/opt/LeadFlowTracker# cd /opt/LeadFlowTracker
+
+# Stop the app
+pm2 stop leadflow-tracker
+
+# Pull latest code from GitHub
+git pull origin main
+
+# Rebuild the application (important!)
+npm run build
+
+# Start the app
+pm2 start ecosystem.config.cjs
+
+# Check logs
+pm2 logs leadflow-tracker --lines 30
+
+>>>> In-memory PM2 is out-of-date, do:
+>>>> $ pm2 update
+In memory PM2 version: 6.0.8
+Local PM2 version: 6.0.13
+
+[PM2] Applying action stopProcessId on app [leadflow-tracker](ids: [ 2 ])
+[PM2] [leadflow-tracker](2) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ elevenlabs-bot     │ fork     │ 37   │ stopped   │ 0%       │ 0b       │
+│ 2  │ leadflow-tracker   │ cluster  │ 217  │ stopped   │ 0%       │ 0b       │
+│ 1  │ notion-api-server  │ fork     │ 0    │ online    │ 0%       │ 57.1mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+remote: Enumerating objects: 58, done.
+remote: Counting objects: 100% (58/58), done.
+remote: Compressing objects: 100% (23/23), done.
+remote: Total 55 (delta 39), reused 48 (delta 32), pack-reused 0 (from 0)
+Unpacking objects: 100% (55/55), 450.59 KiB | 4.69 MiB/s, done.
+From https://github.com/trpl333/LeadFlowTracker
+ * branch            main       -> FETCH_HEAD
+   1c26756..e9510f6  main       -> origin/main
+Updating 1c26756..e9510f6
+Fast-forward
+ .gitignore                                                              |   2 +-
+ ...ttached-assets-echo-attached-assets--1761007699916_1761007699917.txt |  95 ++++++++
+ ...rt-5000-app-main-py-FastAPI-backend--1761001850933_1761001850933.txt | 427 ---------------------------------
+ ...loud-init-jammy-updates-25-2-0ubuntu-1761006346592_1761006346592.txt | 207 ----------------
+ ...Tracker-Step-1-Fix-environment-varia-1761006491143_1761006491143.txt | 135 -----------
+ ...racker-Update-ecosystem-config-cjs-t-1761007826837_1761007826837.txt |  93 +++++++
+ ...rovides-a-single-page-printable-refe-1761001817740_1761001817741.txt | 217 -----------------
+ attached_assets/image_1760995791430.png                                 | Bin 224187 -> 0 bytes
+ attached_assets/image_1760996182645.png                                 | Bin 70692 -> 0 bytes
+ attached_assets/image_1760996387693.png                                 | Bin 60960 -> 0 bytes
+ attached_assets/image_1760996405827.png                                 | Bin 349131 -> 0 bytes
+ attached_assets/image_1760996688726.png                                 | Bin 104017 -> 0 bytes
+ attached_assets/image_1761001700758.png                                 | Bin 240570 -> 0 bytes
+ attached_assets/image_1761001758339.png                                 | Bin 334145 -> 0 bytes
+ attached_assets/image_1761001772956.png                                 | Bin 442416 -> 0 bytes
+ attached_assets/image_1761001907689.png                                 | Bin 218955 -> 0 bytes
+ attached_assets/image_1761005124881.png                                 | Bin 257725 -> 0 bytes
+ create-leads-table.sql                                                  |  28 +++
+ test-database.sh                                                        | 136 +++++++++++
+ 19 files changed, 353 insertions(+), 987 deletions(-)
+ create mode 100644 attached_assets/Pasted--workspace-Remove-the-files-with-secrets-git-rm-r-attached-assets-echo-attached-assets--1761007699916_1761007699917.txt
+ delete mode 100644 attached_assets/Pasted-Summary-Critical-Python-4-main-py-Flask-Orchestrator-port-5000-app-main-py-FastAPI-backend--1761001850933_1761001850933.txt
+ delete mode 100644 attached_assets/Pasted-oot-chatbot-server-apt-list-upgradeable-Listing-Done-cloud-init-jammy-updates-25-2-0ubuntu-1761006346592_1761006346592.txt
+ delete mode 100644 attached_assets/Pasted-root-chatbot-server-opt-LeadFlowTracker-cd-opt-LeadFlowTracker-Step-1-Fix-environment-varia-1761006491143_1761006491143.txt
+ create mode 100644 attached_assets/Pasted-root-chatbot-server-opt-LeadFlowTracker-cd-opt-LeadFlowTracker-Update-ecosystem-config-cjs-t-1761007826837_1761007826837.txt
+ delete mode 100644 attached_assets/Pasted-uroSphereAI-Phone-System-Master-Setup-Summary-This-document-provides-a-single-page-printable-refe-1761001817740_1761001817741.txt
+ delete mode 100644 attached_assets/image_1760995791430.png
+ delete mode 100644 attached_assets/image_1760996182645.png
+ delete mode 100644 attached_assets/image_1760996387693.png
+ delete mode 100644 attached_assets/image_1760996405827.png
+ delete mode 100644 attached_assets/image_1760996688726.png
+ delete mode 100644 attached_assets/image_1761001700758.png
+ delete mode 100644 attached_assets/image_1761001758339.png
+ delete mode 100644 attached_assets/image_1761001772956.png
+ delete mode 100644 attached_assets/image_1761001907689.png
+ delete mode 100644 attached_assets/image_1761005124881.png
+ create mode 100644 create-leads-table.sql
+ create mode 100755 test-database.sh
+
+> rest-express@1.0.0 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+
+vite v5.4.20 building for production...
+transforming (3) src/main.tsxBrowserslist: browsers data (caniuse-lite) is 12 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 2670 modules transformed.
+../dist/public/index.html                   0.94 kB │ gzip:   0.52 kB
+../dist/public/assets/index-C9Q9JJy-.css   75.05 kB │ gzip:  12.00 kB
+../dist/public/assets/index-DSap9Pzk.js   559.52 kB │ gzip: 171.37 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 9.97s
+
+  dist/index.js  21.7kb
+
+⚡ Done in 9ms
+
+>>>> In-memory PM2 is out-of-date, do:
+>>>> $ pm2 update
+In memory PM2 version: 6.0.8
+Local PM2 version: 6.0.13
+
+[PM2] Applying action restartProcessId on app [leadflow-tracker](ids: [ 2 ])
+[PM2] [leadflow-tracker](2) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ elevenlabs-bot     │ fork     │ 37   │ stopped   │ 0%       │ 0b       │
+│ 2  │ leadflow-tracker   │ cluster  │ 217  │ online    │ 0%       │ 40.4mb   │
+│ 1  │ notion-api-server  │ fork     │ 0    │ online    │ 0%       │ 57.1mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+
+>>>> In-memory PM2 is out-of-date, do:
+>>>> $ pm2 update
+In memory PM2 version: 6.0.8
+Local PM2 version: 6.0.13
+
+[TAILING] Tailing last 30 lines for [leadflow-tracker] process (change the value with --lines option)
+/var/log/leadflow/error-2.log last 30 lines:
+/var/log/leadflow/out-2.log last 30 lines:
+2|leadflow | > NODE_ENV=production node dist/index.js
+2|leadflow | 
+2|leadflow | 2025-10-21T00:52:11: 2025-10-21T00:52:12: 
+2|leadflow | > rest-express@1.0.0 start
+2|leadflow | > NODE_ENV=production node dist/index.js
+2|leadflow | 
+2|leadflow | 2025-10-21T00:52:14: 2025-10-21T00:52:14: 
+2|leadflow | > rest-express@1.0.0 start
+2|leadflow | > NODE_ENV=production node dist/index.js
+2|leadflow | 
+2|leadflow | 2025-10-21T00:52:16: 2025-10-21T00:52:17: 
+2|leadflow | > rest-express@1.0.0 start
+2|leadflow | > NODE_ENV=production node dist/index.js
+2|leadflow | 
+2|leadflow | 2025-10-21T00:52:18: 2025-10-21T00:52:19: 
+2|leadflow | > rest-express@1.0.0 start
+2|leadflow | > NODE_ENV=production node dist/index.js
+2|leadflow | 
+2|leadflow | 2025-10-21T00:52:21: 2025-10-21T00:52:21: 
+2|leadflow | > rest-express@1.0.0 start
+2|leadflow | > NODE_ENV=production node dist/index.js
+2|leadflow | 
+2|leadflow | 2025-10-21T00:52:23: 2025-10-21T00:52:24: 
+2|leadflow | > rest-express@1.0.0 start
+2|leadflow | > NODE_ENV=production node dist/index.js
+2|leadflow | 
+2|leadflow | 2025-10-21T00:52:38: 
+2|leadflow | > rest-express@1.0.0 start
+2|leadflow | > NODE_ENV=production node dist/index.js
+2|leadflow | 
+
+2|leadflow-tracker  | 2025-10-21T00:52:40: 
+2|leadflow-tracker  | 2025-10-21T00:52:40: 
+2|leadflow-tracker  | 2025-10-21T00:52:40: 
+2|leadflow-tracker  | 2025-10-21T00:52:40: 
+2|leadflow-tracker  | > rest-express@1.0.0 start
+2|leadflow-tracker  | > NODE_ENV=production node dist/index.js
+2|leadflow-tracker  | 2025-10-21T00:52:42: 
+2|leadflow-tracker  | 2025-10-21T00:52:42: 
+2|leadflow-tracker  | 2025-10-21T00:52:42: 
+2|leadflow-tracker  | 2025-10-21T00:52:43: 
+2|leadflow-tracker  | > rest-express@1.0.0 start
+2|leadflow-tracker  | > NODE_ENV=production node dist/index.js
+2|leadflow-tracker  | 2025-10-21T00:52:45: 
+2|leadflow-tracker  | 2025-10-21T00:52:45: 
+2|leadflow-tracker  | 2025-10-21T00:52:45: 
+2|leadflow-tracker  | 2025-10-21T00:52:45: 
+2|leadflow-tracker  | > rest-express@1.0.0 start
+2|leadflow-tracker  | > NODE_ENV=production node dist/index.js
+2|leadflow-tracker  | 2025-10-21T00:52:47: 
+2|leadflow-tracker  | 2025-10-21T00:52:47: 
+2|leadflow-tracker  | 2025-10-21T00:52:47: 
+2|leadflow-tracker  | 2025-10-21T00:52:47: 
+2|leadflow-tracker  | > rest-express@1.0.0 start
+2|leadflow-tracker  | > NODE_ENV=production node dist/index.js
+2|leadflow-tracker  | 2025-10-21T00:52:49: 
+2|leadflow-tracker  | 2025-10-21T00:52:49: 
+2|leadflow-tracker  | 2025-10-21T00:52:49: 
+2|leadflow-tracker  | 2025-10-21T00:52:50: 
+2|leadflow-tracker  | > rest-express@1.0.0 start
+2|leadflow-tracker  | > NODE_ENV=production node dist/index.js
+2|leadflow-tracker  | 2025-10-21T00:52:52: 
+2|leadflow-tracker  | 2025-10-21T00:52:52: 
+2|leadflow-tracker  | 2025-10-21T00:52:52: 
+2|leadflow-tracker  | 2025-10-21T00:52:52: 
+2|leadflow-tracker  | > rest-express@1.0.0 start
+2|leadflow-tracker  | > NODE_ENV=production node dist/index.js
+2|leadflow-tracker  | 2025-10-21T00:52:54: 
+2|leadflow-tracker  | 2025-10-21T00:52:54: 
+2|leadflow-tracker  | 2025-10-21T00:52:54: 
+2|leadflow-tracker  | 2025-10-21T00:52:55: 
+2|leadflow-tracker  | > rest-express@1.0.0 start
+2|leadflow-tracker  | > NODE_ENV=production node dist/index.js
+^C
+root@chatbot-server:/opt/LeadFlowTracker# 
