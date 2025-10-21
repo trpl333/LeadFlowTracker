@@ -1,0 +1,81 @@
+root@chatbot-server:/opt/LeadFlowTracker# cd /opt/LeadFlowTracker
+
+# Create NEW test with CORRECT hostname
+cat > test-db-fixed.sh << 'SCRIPT_END'
+#!/bin/bash
+
+echo "🏥 ai-memory Database Health Check (UPDATED)"
+echo "===================================="
+echo ""
+
+DB_HOST="ai-memory-do-user-17983093-0.e.db.ondigitalocean.com"
+DB_PORT="25061"
+DB_CONNECTION="postgresql://doadmin:AVNS_uS8rBktm7cJo7ToivuD@ai-memory-do-user-17983093-0.e.db.ondigitalocean.com:25061/ai-memory-pool?sslmode=require"
+
+# Test 1: DNS Resolution
+echo "Test 1: DNS Resolution"
+if nslookup $DB_HOST > /dev/null 2>&1; then
+    echo "✅ DNS works - Resolved to: $(nslookup $DB_HOST | grep -A1 'Name:' | grep 'Address:' | awk '{print $2}')"
+else
+    echo "❌ DNS failed"
+fi
+echo ""
+
+# Test 2: Port connectivity
+echo "Test 2: Port Connectivity"
+if timeout 5 bash -c "cat < /dev/null > /dev/tcp/$DB_HOST/$DB_PORT" 2>/dev/null; then
+    echo "✅ Port $DB_PORT is REACHABLE"
+else
+    echo "❌ Port $DB_PORT is NOT REACHABLE"
+fi
+echo ""
+
+# Test 3: Server info
+echo "Test 3: Server Info"
+echo "Server IP: $(curl -s ifconfig.me)"
+echo ""
+
+# Test 4: Database connection
+echo "Test 4: Database Connection"
+
+if ! command -v psql &> /dev/null; then
+    echo "Installing postgresql-client..."
+./test-db-fixed.shixed.sh================="&1 | head -10 COUNT(*) FROM leads;")ma.tables WHERE table_name = 'lead
+🏥 ai-memory Database Health Check (UPDATED)
+====================================
+
+Test 1: DNS Resolution
+✅ DNS works - Resolved to: 165.232.140.60
+
+Test 2: Port Connectivity
+✅ Port 25061 is REACHABLE
+
+Test 3: Server Info
+Server IP: 209.38.143.71
+
+Test 4: Database Connection
+✅ DATABASE CONNECTION: SUCCESS!
+
+PostgreSQL Version:
+ PostgreSQL 17.6 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 14.2.1 20240912 (Red Hat 14.2.1-3), 64-bit
+
+Existing Tables:
+                 List of relations
+ Schema |          Name           | Type  |  Owner  
+--------+-------------------------+-------+---------
+ public | call_history            | table | doadmin
+ public | customer_configurations | table | doadmin
+ public | customer_usage          | table | doadmin
+ public | customers               | table | doadmin
+ public | memories                | table | doadmin
+ public | memory                  | table | doadmin
+ public | memory_logs             | table | doadmin
+(7 rows)
+
+
+⚠️  'leads' table does NOT exist yet
+
+====================================
+🏁 Test Complete
+====================================
+root@chatbot-server:/opt/LeadFlowTracker# 
