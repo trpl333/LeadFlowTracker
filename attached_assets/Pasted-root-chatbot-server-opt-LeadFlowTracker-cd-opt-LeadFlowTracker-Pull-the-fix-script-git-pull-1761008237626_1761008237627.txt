@@ -1,0 +1,39 @@
+root@chatbot-server:/opt/LeadFlowTracker# cd /opt/LeadFlowTracker
+
+# Pull the fix script
+git pull origin main
+
+# Run the fix
+./fix-production-build.sh
+remote: Enumerating objects: 11, done.
+remote: Counting objects: 100% (11/11), done.
+remote: Compressing objects: 100% (5/5), done.
+remote: Total 9 (delta 4), reused 9 (delta 4), pack-reused 0 (from 0)
+Unpacking objects: 100% (9/9), 5.54 KiB | 1.38 MiB/s, done.
+From https://github.com/trpl333/LeadFlowTracker
+ * branch            main       -> FETCH_HEAD
+   e9510f6..a3de9da  main       -> origin/main
+Updating e9510f6..a3de9da
+Fast-forward
+ ...2-update-Stop-the-app-pm2-stop-leadf-1761008093707_1761008093708.txt |  85 ++++++++++++++
+ ...Tracker-Stop-the-app-pm2-stop-leadfl-1761007988533_1761007988533.txt | 202 +++++++++++++++++++++++++++++++++
+ fix-production-build.sh                                                 |  17 +++
+ 3 files changed, 304 insertions(+)
+ create mode 100644 attached_assets/Pasted-root-chatbot-server-opt-LeadFlowTracker-Update-PM2-pm2-update-Stop-the-app-pm2-stop-leadf-1761008093707_1761008093708.txt
+ create mode 100644 attached_assets/Pasted-root-chatbot-server-opt-LeadFlowTracker-cd-opt-LeadFlowTracker-Stop-the-app-pm2-stop-leadfl-1761007988533_1761007988533.txt
+ create mode 100755 fix-production-build.sh
+🔧 Fixing production build...
+✅ Fixed! Starting app...
+[PM2][WARN] Applications leadflow-tracker not running, starting...
+[PM2] App [leadflow-tracker] launched (1 instances)
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ leadflow-tracker   │ cluster  │ 0    │ online    │ 0%       │ 41.3mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[TAILING] Tailing last 20 lines for [leadflow-tracker] process (change the value with --lines option)
+/var/log/leadflow/out-0.log last 20 lines:
+/var/log/leadflow/error-0.log last 20 lines:
+0|leadflow-tracker  | 2025-10-21T00:56:59: 
+0|leadflow-tracker  | > rest-express@1.0.0 start
+0|leadflow-tracker  | > NODE_ENV=production node dist/index.js
