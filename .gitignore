@@ -5,13 +5,15 @@ server/public
 vite.config.ts.*
 *.tar.gz
 
-# Environment
+# Environment variables (keep .env.example)
 .env
 .env.local
+.env.production
 
 # Logs
 *.log
 /tmp/
+/var/log/
 
 # Replit specific
 .replit
@@ -22,3 +24,11 @@ replit.nix
 
 # Setup scripts
 setup-github.js
+push-to-github.sh
+
+# PM2
+.pm2
+pids
+*.pid
+*.seed
+*.pid.lock

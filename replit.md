@@ -105,22 +105,89 @@ Following a productivity-focused design inspired by Linear and Notion:
 - Responsive design for mobile and desktop
 - Keyboard navigation support
 
+## Deployment Architecture
+
+### Development Environment (Replit)
+- **Database**: Replit PostgreSQL (Neon)
+- **URL**: Replit workspace preview
+- **Purpose**: Development and testing
+- **Google Sheets**: Automatic backup sync
+
+### Production Environment (DigitalOcean)
+- **Database**: DigitalOcean ai-memory PostgreSQL (shared with ChatStack/NeuroSphere)
+- **URL**: https://leads.theinsurancedoctors.com
+- **GitHub**: https://github.com/trpl333/LeadFlowTracker
+- **Server**: Same droplet as ChatStack (209.38.143.71)
+- **Process Manager**: PM2
+- **Reverse Proxy**: Nginx with SSL (Let's Encrypt)
+
+### Deployment Workflow
+```
+Replit → GitHub → DigitalOcean
+   ↓         ↓          ↓
+Replit DB  Code     ai-memory DB
+           Repo     (Production)
+```
+
+**To deploy changes:**
+1. Make changes in Replit workspace
+2. Commit and push to GitHub: `git push origin main`
+3. SSH to DigitalOcean: `ssh root@209.38.143.71`
+4. Navigate to project: `cd /opt/LeadFlowTracker`
+5. Run deploy script: `./deploy.sh`
+
+Or manually:
+```bash
+git pull origin main
+npm install
+npm run build
+npm run db:push
+pm2 restart leadflow-tracker
+```
+
+## Integration with ai-memory Ecosystem
+
+The Lead Tracker integrates with the existing NeuroSphere AI ecosystem:
+
+- **Shared Database**: Uses DigitalOcean ai-memory PostgreSQL in production
+- **ChatStack Access**: AI phone system can query lead data for context
+- **Notion Integration**: Lead data can be synced to Notion via ai-memory
+- **Data Consistency**: All systems share the same source of truth
+
+### Database Tables in ai-memory
+- `leads` - Lead tracker data (this app)
+- `users` - Authentication (shared)
+- Other tables used by ChatStack/NeuroSphere
+
 ## Recent Changes
+
+**2025-10-21**: Production deployment setup
+- GitHub repository created and connected
+- DigitalOcean deployment configuration
+- Environment-aware database connection
+- PM2 process management setup
+- Nginx reverse proxy configuration
+- SSL certificate setup for custom domain
 
 **2025-10-20**: Initial implementation
 - Complete lead tracking system
+- PostgreSQL database with Drizzle ORM
 - Google Sheets integration
 - Dashboard with analytics
 - Filter and search functionality
 - Dark mode with theme toggle
 - Milestone progression system
 - Mark as lost/reactivate functionality
+- Bulk actions system
+- Editable notes with history
+- Stage date tracking
 
 ## Development
 
 The app runs on port 5000 with hot reload enabled:
 - Frontend: Vite dev server
 - Backend: Express with tsx for TypeScript
+- Database: Replit PostgreSQL (development) or DigitalOcean (production)
 - Google Sheets: Connected via Replit integration
 
 ## Future Enhancements
