@@ -11,7 +11,7 @@ const doDbUrl = process.env.DO_DATABASE_URL;
 const replitDbUrl = process.env.DATABASE_URL;
 const isProduction = process.env.NODE_ENV === 'production';
 
-let db;
+let db: ReturnType<typeof drizzleNeon> | ReturnType<typeof drizzlePostgres>;
 
 if (doDbUrl && isProduction) {
   // Production: DigitalOcean ai-memory database

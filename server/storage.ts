@@ -30,7 +30,7 @@ export class DbStorage implements IStorage {
     
     const newLead = {
       ...insertLead,
-      currentStage: "First Contact",
+      currentStage: "First Contact" as const,
       completedMilestones: [],
       notes: insertLead.notes || "",
       createdAt: now,
@@ -38,7 +38,7 @@ export class DbStorage implements IStorage {
       stageEnteredAt: now,
     };
     
-    const result = await db.insert(leads).values(newLead).returning();
+    const result = await db.insert(leads).values(newLead as any).returning();
     const lead = result[0];
     
     try {
