@@ -1,0 +1,115 @@
+root@chatbot-server:/opt/LeadFlowTracker# cd /opt/LeadFlowTracker
+
+echo "================================"
+echo "🔧 Fixing Remaining Issues..."
+echo "================================"
+echo ""
+
+# Step 1: Create leads table manually (bypass SSL issue)
+echo "📊 Creating 'leads' table manually..."
+psql "postgresql://doadmin:AVNS_uS8rBktm7cJo7ToivuD@ai-memory-do-user-17983093-0.e.db.ondigitalocean.com:25061/ai-memory-pool?sslmode=require" << 'SQL'
+CREATE TABLE IF NOT EXISTS leads (
+  id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
+  name VARCHAR NOT NULL,
+  company VARCHAR NOT NULL,
+  phone VARCHAR NOT NULL,
+  email VARCHAR NOT NULL,
+  source VARCHAR NOT NULL,
+  current_stage VARCHAR NOT NULL DEFAULT 'first_contact',
+  completed_milestones TEXT[] DEFAULT '{}',
+  milestone_history JSONB DEFAULT '[]',
+  notes TEXT DEFAULT '',
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW(),
+  stage_entered_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_leads_current_stage ON leads(current_stage);
+CREATE INDEX IF NOT EXISTS idx_leads_created_at ON leads(created_at DESC);
+
+SELECT 'Table created successfully!' as status;
+\d leads
+SQL
+
+echo ""
+echo "✅ Leads table created!"
+echo ""
+
+# Step 2: Restart app to pick up database
+echo "🔄 Restarting application..."
+pm2 restart leadflow-tracker
+
+sleep 3
+
+echo "" Check logs: pm2 logs leadflow-tracker"rs.com"tbot..."|Congratulations|Certificate|error)" || {-tos --emai
+================================
+🔧 Fixing Remaining Issues...
+================================
+
+📊 Creating 'leads' table manually...
+CREATE TABLE
+CREATE INDEX
+CREATE INDEX
+           status            
+-----------------------------
+ Table created successfully!
+(1 row)
+
+                                              Table "public.leads"
+        Column        |            Type             | Collation | Nullable |              Default               
+----------------------+-----------------------------+-----------+----------+------------------------------------
+ id                   | character varying           |           | not null | gen_random_uuid()
+ name                 | character varying           |           | not null | 
+ company              | character varying           |           | not null | 
+ phone                | character varying           |           | not null | 
+ email                | character varying           |           | not null | 
+ source               | character varying           |           | not null | 
+ current_stage        | character varying           |           | not null | 'first_contact'::character varying
+ completed_milestones | text[]                      |           |          | '{}'::text[]
+ milestone_history    | jsonb                       |           |          | '[]'::jsonb
+ notes                | text                        |           |          | ''::text
+ created_at           | timestamp without time zone |           |          | now()
+ updated_at           | timestamp without time zone |           |          | now()
+ stage_entered_at     | timestamp without time zone |           |          | now()
+Indexes:
+    "leads_pkey" PRIMARY KEY, btree (id)
+    "idx_leads_created_at" btree (created_at DESC)
+    "idx_leads_current_stage" btree (current_stage)
+
+
+✅ Leads table created!
+
+🔄 Restarting application...
+Use --update-env to update environment variables
+
+>>>> In-memory PM2 is out-of-date, do:
+>>>> $ pm2 update
+In memory PM2 version: 6.0.8
+Local PM2 version: 6.0.13
+
+[PM2] Applying action restartProcessId on app [leadflow-tracker](ids: [ 2 ])
+[PM2] [leadflow-tracker](2) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ elevenlabs-bot     │ fork     │ 37   │ stopped   │ 0%       │ 0b       │
+│ 2  │ leadflow-tracker   │ cluster  │ 56   │ online    │ 0%       │ 41.2mb   │
+│ 1  │ notion-api-server  │ fork     │ 0    │ online    │ 0%       │ 57.9mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+
+🧪 Testing API endpoint...
+
+
+🔒 Setting up SSL certificate...
+Certbot failed to authenticate some domains (authenticator: webroot). The Certificate Authority reported these problems:
+Hint: The Certificate Authority failed to download the temporary challenge files created by Certbot. Ensure that the listed domains serve their content from the provided --webroot-path/-w and that files created there can be downloaded from the internet.
+
+================================
+✅ SETUP COMPLETE!
+================================
+
+🌐 Visit: https://leads.theinsurancedoctors.com
+📊 Database: ai-memory PostgreSQL
+🔍 Check logs: pm2 logs leadflow-tracker
+
+root@chatbot-server:/opt/LeadFlowTracker# 
