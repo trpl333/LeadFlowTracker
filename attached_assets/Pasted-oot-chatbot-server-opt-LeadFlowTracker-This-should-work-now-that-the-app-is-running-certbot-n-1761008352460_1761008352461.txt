@@ -1,0 +1,29 @@
+oot@chatbot-server:/opt/LeadFlowTracker# # This should work now that the app is running
+certbot --nginx -d leads.theinsurancedoctors.com
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Requesting a certificate for leads.theinsurancedoctors.com
+
+Certbot failed to authenticate some domains (authenticator: nginx). The Certificate Authority reported these problems:
+  Domain: leads.theinsurancedoctors.com
+  Type:   unauthorized
+  Detail: 34.111.179.208: Invalid response from http://leads.theinsurancedoctors.com/.well-known/acme-challenge/SGJql5_SpOF4mOiodPq8_ApcsMPMmbiA8AtXOIiYPIQ: 500
+
+Hint: The Certificate Authority failed to verify the temporary nginx configuration changes made by Certbot. Ensure the listed domains point to this nginx server and that it is accessible from the internet.
+
+Some challenges have failed.
+Ask for help or search for solutions at https://community.letsencrypt.org. See the logfile /var/log/letsencrypt/letsencrypt.log or re-run Certbot with -v for more details.
+root@chatbot-server:/opt/LeadFlowTracker# # Alternative method
+certbot certonly --standalone -d leads.theinsurancedoctors.com --pre-hook "systemctl stop nginx" --post-hook "systemctl start nginx"
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Requesting a certificate for leads.theinsurancedoctors.com
+
+Certbot failed to authenticate some domains (authenticator: standalone). The Certificate Authority reported these problems:
+  Domain: leads.theinsurancedoctors.com
+  Type:   unauthorized
+  Detail: 34.111.179.208: Invalid response from http://leads.theinsurancedoctors.com/.well-known/acme-challenge/d6xJxyuXeOu4cz9Hscdss5ldJs11Wv79PMr44S8JrU4: 500
+
+Hint: The Certificate Authority failed to download the challenge files from the temporary standalone webserver started by Certbot on port 80. Ensure that the listed domains point to this machine and that it can accept inbound connections from the internet.
+
+Some challenges have failed.
+Ask for help or search for solutions at https://community.letsencrypt.org. See the logfile /var/log/letsencrypt/letsencrypt.log or re-run Certbot with -v for more details.
+root@chatbot-server:/opt/LeadFlowTracker# 
