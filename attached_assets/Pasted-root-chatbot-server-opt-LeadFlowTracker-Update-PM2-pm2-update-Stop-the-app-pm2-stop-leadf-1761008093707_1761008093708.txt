@@ -1,0 +1,85 @@
+root@chatbot-server:/opt/LeadFlowTracker# # Update PM2
+pm2 update
+
+# Stop the app
+pm2 stop leadflow-tracker
+
+# Now run directly to see the error
+cd /opt/LeadFlowTracker
+NODE_ENV=production DATABASE_URL='postgresql://doadmin:AVNS_uS8rBktm7cJo7ToivuD@ai-memory-do-user-17983093-0.e.db.ondigitalocean.com:25061/ai-memory-pool?sslmode=require' DO_DATABASE_URL='postgresql://doadmin:AVNS_uS8rBktm7cJo7ToivuD@ai-memory-do-user-17983093-0.e.db.ondigitalocean.com:25061/ai-memory-pool?sslmode=require' PORT=5001 npm start
+Be sure to have the latest version by doing `npm install pm2@latest -g` before doing this procedure.
+
+>>>> In-memory PM2 is out-of-date, do:
+>>>> $ pm2 update
+In memory PM2 version: 6.0.8
+Local PM2 version: 6.0.13
+
+
+                  -------------
+
+
+  ██████╗ ███╗   ███╗██████╗     ██╗    ██╗ ██████╗
+  ██╔══██╗████╗ ████║╚════██╗    ██║   ██╔╝██╔═══██╗
+  ██████╔╝██╔████╔██║ █████╔╝    ██║  ██╔╝ ██║   ██║
+  ██╔═══╝ ██║╚██╔╝██║██╔═══╝     ██║ ██╔╝  ██║   ██║
+  ██║     ██║ ╚═╝ ██║███████╗    ██║██╔╝   ╚██████╔╝
+  ╚═╝     ╚═╝     ╚═╝╚══════╝    ╚═╝╚═╝     ╚═════╝
+
+                  https://pm2.io/
+
+     Harden your Node.js Production Environment
+
+      - Real-time Monitoring Web Interface
+      - Pro Active Alerting System
+      - Production Profiling for Memory and CPU
+      - PM2 Runtime High Availability Fallback
+
+
+             Start using it by typing:
+
+                    $ pm2 plus
+
+                  -------------
+
+[PM2] Applying action deleteProcessId on app [all](ids: [ 0, 1, 2 ])
+[PM2] [elevenlabs-bot](0) ✓
+[PM2] [leadflow-tracker](2) ✓
+[PM2] [notion-api-server](1) ✓
+[PM2] [v] All Applications Stopped
+[PM2] [v] PM2 Daemon Stopped
+[PM2] Spawning PM2 daemon with pm2_home=/root/.pm2
+[PM2] Restoring processes located in /root/.pm2/dump.pm2
+[PM2] Process /root/elevenlabs-twilio-i-o/index.js restored
+[PM2] Process /opt/ChatStack/.notion_backup_replit/notion-api-server.js restored
+[PM2] Process /usr/bin/npm restored
+>>>>>>>>>> PM2 updated
+
+
+
+^C
+[PM2] Spawning PM2 daemon with pm2_home=/root/.pm2
+[PM2] PM2 Successfully daemonized
+[PM2][ERROR] Process or Namespace leadflow-tracker not found
+
+> rest-express@1.0.0 start
+> NODE_ENV=production node dist/index.js
+
+🚀 Production mode: Connected to DigitalOcean ai-memory database
+node:internal/errors:496
+    ErrorCaptureStackTrace(err);
+    ^
+
+TypeError [ERR_INVALID_ARG_TYPE]: The "paths[0]" argument must be of type string. Received undefined
+    at new NodeError (node:internal/errors:405:5)
+    at validateString (node:internal/validators:162:11)
+    at Object.resolve (node:path:1115:7)
+    at file:///opt/LeadFlowTracker/dist/index.js:562:17
+    at ModuleJob.run (node:internal/modules/esm/module_job:195:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:337:24)
+    at async loadESM (node:internal/process/esm_loader:34:7)
+    at async handleMainPromise (node:internal/modules/run_main:106:12) {
+  code: 'ERR_INVALID_ARG_TYPE'
+}
+
+Node.js v18.20.8
+root@chatbot-server:/opt/LeadFlowTracker# 
