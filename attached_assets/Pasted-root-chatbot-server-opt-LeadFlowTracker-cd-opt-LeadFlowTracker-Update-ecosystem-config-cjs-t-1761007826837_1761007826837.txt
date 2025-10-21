@@ -1,0 +1,93 @@
+root@chatbot-server:/opt/LeadFlowTracker# cd /opt/LeadFlowTracker
+
+# Update ecosystem.config.cjs to load .env file
+cat > ecosystem.config.cjs << 'EOF'
+module.exports = {
+  apps: [{
+    name: 'leadflow-tracker',
+    script: 'npm',
+    args: 'start',
+    cwd: '/opt/LeadFlowTracker',
+    env: {
+      NODE_ENV: 'production',
+      PORT: 5001,
+      DATABASE_URL: 'postgresql://doadmin:AVNS_uS8rBktm7cJo7ToivuD@ai-memory-do-user-17983093-0.e.db.ondigitalocean.com:25061/ai-memory-pool?sslmode=require',
+      DO_DATABASE_URL: 'postgresql://doadmin:AVNS_uS8rBktm7cJo7ToivuD@ai-memory-do-user-17983093-0.e.db.ondigitalocean.com:25061/ai-memory-pool?sslmode=require'
+    },
+    instances: 1,
+    autorestart: true,
+    watch: false,
+    max_memory_restart: '500M',
+    error_file: '/var/log/leadflow/error.log',
+    out_file: '/var/log/leadflow/out.log',
+    log_file: '/var/log/leadflow/combined.log',
+    time: true
+  }]
+};
+EOF
+
+# Start the app
+pm2 start ecosystem.config.cjs
+pm2 save
+
+# Check if it's running
+sleep 3
+pm2 logs leadflow-tracker --lines 20 --nostream
+
+# Test API
+curl http://localhost:5001/api/leads
+
+>>>> In-memory PM2 is out-of-date, do:
+>>>> $ pm2 update
+In memory PM2 version: 6.0.8
+Local PM2 version: 6.0.13
+
+[PM2] Applying action restartProcessId on app [leadflow-tracker](ids: [ 2 ])
+[PM2] [leadflow-tracker](2) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ elevenlabs-bot     │ fork     │ 37   │ stopped   │ 0%       │ 0b       │
+│ 2  │ leadflow-tracker   │ cluster  │ 162  │ online    │ 0%       │ 40.5mb   │
+│ 1  │ notion-api-server  │ fork     │ 0    │ online    │ 0%       │ 57.4mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[PM2] Saving current process list...
+
+>>>> In-memory PM2 is out-of-date, do:
+>>>> $ pm2 update
+In memory PM2 version: 6.0.8
+Local PM2 version: 6.0.13
+
+[PM2] Successfully saved in /root/.pm2/dump.pm2
+
+>>>> In-memory PM2 is out-of-date, do:
+>>>> $ pm2 update
+In memory PM2 version: 6.0.8
+Local PM2 version: 6.0.13
+
+[TAILING] Tailing last 20 lines for [leadflow-tracker] process (change the value with --lines option)
+/var/log/leadflow/error-2.log last 20 lines:
+/var/log/leadflow/out-2.log last 20 lines:
+2|leadflow | 2025-10-21T00:47:27: 2025-10-21T00:47:28: 
+2|leadflow | > rest-express@1.0.0 start
+2|leadflow | > NODE_ENV=production node dist/index.js
+2|leadflow | 
+2|leadflow | 2025-10-21T00:47:30: 2025-10-21T00:47:30: 
+2|leadflow | > rest-express@1.0.0 start
+2|leadflow | > NODE_ENV=production node dist/index.js
+2|leadflow | 
+2|leadflow | 2025-10-21T00:47:32: 2025-10-21T00:47:33: 
+2|leadflow | > rest-express@1.0.0 start
+2|leadflow | > NODE_ENV=production node dist/index.js
+2|leadflow | 
+2|leadflow | 2025-10-21T00:47:35: 2025-10-21T00:50:07: 
+2|leadflow | > rest-express@1.0.0 start
+2|leadflow | > NODE_ENV=production node dist/index.js
+2|leadflow | 
+2|leadflow | 2025-10-21T00:50:09: 2025-10-21T00:50:10: 
+2|leadflow | > rest-express@1.0.0 start
+2|leadflow | > NODE_ENV=production node dist/index.js
+2|leadflow | 
+
+curl: (7) Failed to connect to localhost port 5001 after 0 ms: Connection refused
+root@chatbot-server:/opt/LeadFlowTracker# 
