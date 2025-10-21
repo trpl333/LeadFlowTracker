@@ -1,0 +1,151 @@
+root@chatbot-server:/opt/LeadFlowTracker# cd /opt/LeadFlowTracker
+
+echo "================================"
+echo "🚀 Deploying LeadFlowTracker..."
+echo "================================"
+echo ""
+
+# Step 1: Push database schema (create 'leads' table)
+echo "📊 Creating 'leads' table in ai-memory database..."
+npm run db:push --force
+
+# Step 2: Start app with PM2
+echo ""
+echo "🚀 Starting application with PM2..."
+pm2 delete leadflow-tracker 2>/dev/null || true  # Remove if exists
+pm2 start ecosystem.config.cjs
+pm2 save
+
+# Step 3: Check status
+echo ""
+echo "✅ Application Status:"
+pm2 status
+
+echo ""
+echo "📋 Recent logs:"
+pm2 logs leadflow-tracker --lines 15 --nostream
+
+# Step 4: Test locally
+echo ""
+echo "🧪 Testing local connection..."
+sleep 3
+curl -s http://localhost:5001/api/leads | head -30
+
+# Step 5: Get SSL certificate
+echo ""
+echo "🔒 Getting SSL certificate..."
+certbot --nginx -d leads.theinsurancedoctors.com --non-interactive --agree-tos --email admin@theinsurancedoctors.com || echo "⚠️  SSL setup failed - you may need to run this manually"
+
+echo ""
+echo "================================"
+echo "✅ DEPLOYMENT COMPLETE!"
+echo "================================"
+echo ""
+echo "" Stop: pm2 stop leadflow-tracker"acker"tack)"
+================================
+🚀 Deploying LeadFlowTracker...
+================================
+
+📊 Creating 'leads' table in ai-memory database...
+npm warn using --force Recommended protections disabled.
+
+> rest-express@1.0.0 db:push
+> drizzle-kit push
+
+No config path provided, using default 'drizzle.config.ts'
+Reading config file '/opt/LeadFlowTracker/drizzle.config.ts'
+Using 'pg' driver for database querying
+[⣷] Pulling schema from database...
+Error: self-signed certificate in certificate chain
+    at /opt/LeadFlowTracker/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Object.query (/opt/LeadFlowTracker/node_modules/drizzle-kit/bin.cjs:80601:26)
+    at async fromDatabase2 (/opt/LeadFlowTracker/node_modules/drizzle-kit/bin.cjs:19253:25) {
+  code: 'SELF_SIGNED_CERT_IN_CHAIN'
+}
+
+🚀 Starting application with PM2...
+
+>>>> In-memory PM2 is out-of-date, do:
+>>>> $ pm2 update
+In memory PM2 version: 6.0.8
+Local PM2 version: 6.0.13
+
+
+>>>> In-memory PM2 is out-of-date, do:
+>>>> $ pm2 update
+In memory PM2 version: 6.0.8
+Local PM2 version: 6.0.13
+
+[PM2][WARN] Applications leadflow-tracker not running, starting...
+[PM2] App [leadflow-tracker] launched (1 instances)
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ elevenlabs-bot     │ fork     │ 37   │ stopped   │ 0%       │ 0b       │
+│ 2  │ leadflow-tracker   │ cluster  │ 0    │ online    │ 0%       │ 40.8mb   │
+│ 1  │ notion-api-server  │ fork     │ 0    │ online    │ 0%       │ 57.4mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[PM2] Saving current process list...
+
+>>>> In-memory PM2 is out-of-date, do:
+>>>> $ pm2 update
+In memory PM2 version: 6.0.8
+Local PM2 version: 6.0.13
+
+[PM2] Successfully saved in /root/.pm2/dump.pm2
+
+✅ Application Status:
+
+>>>> In-memory PM2 is out-of-date, do:
+>>>> $ pm2 update
+In memory PM2 version: 6.0.8
+Local PM2 version: 6.0.13
+
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ elevenlabs-bot     │ fork     │ 37   │ stopped   │ 0%       │ 0b       │
+│ 2  │ leadflow-tracker   │ cluster  │ 0    │ online    │ 0%       │ 62.3mb   │
+│ 1  │ notion-api-server  │ fork     │ 0    │ online    │ 0%       │ 57.0mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+
+📋 Recent logs:
+
+>>>> In-memory PM2 is out-of-date, do:
+>>>> $ pm2 update
+In memory PM2 version: 6.0.8
+Local PM2 version: 6.0.13
+
+[TAILING] Tailing last 15 lines for [leadflow-tracker] process (change the value with --lines option)
+/var/log/leadflow/error-2.log last 15 lines:
+/var/log/leadflow/out-2.log last 15 lines:
+2|leadflow | 2025-10-21T00:40:54: 
+2|leadflow | > rest-express@1.0.0 start
+2|leadflow | > NODE_ENV=production node dist/index.js
+2|leadflow | 
+
+
+🧪 Testing local connection...
+
+🔒 Getting SSL certificate...
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Requesting a certificate for leads.theinsurancedoctors.com
+An unexpected error occurred:
+The request message was malformed :: No such authorization
+Ask for help or search for solutions at https://community.letsencrypt.org. See the logfile /var/log/letsencrypt/letsencrypt.log or re-run Certbot with -v for more details.
+⚠️  SSL setup failed - you may need to run this manually
+
+================================
+✅ DEPLOYMENT COMPLETE!
+================================
+
+🌐 Your app should be live at:
+   https://leads.theinsurancedoctors.com
+
+📊 Database: ai-memory (shared with ChatStack)
+📝 View logs: pm2 logs leadflow-tracker
+🔄 Restart: pm2 restart leadflow-tracker
+❌ Stop: pm2 stop leadflow-tracker
+
+root@chatbot-server:/opt/LeadFlowTracker# 
