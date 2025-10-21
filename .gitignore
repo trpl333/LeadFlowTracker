@@ -31,4 +31,4 @@ push-to-github.sh
 pids
 *.pid
 *.seed
-*.pid.lock
+*.pid.lockattached_assets/
