@@ -1,0 +1,72 @@
+root@chatbot-server:~# cd /opt/LeadFlowTracker
+# Pull latest changes
+git pull origin main
+# Rebuild (compiles TypeScript)
+npm run build
+# Fix production build
+./fix-production-build.sh
+# Restart app (automatic)
+pm2 restart leadflow-tracker
+remote: Enumerating objects: 13, done.
+remote: Counting objects: 100% (13/13), done.
+remote: Compressing objects: 100% (1/1), done.
+remote: Total 8 (delta 7), reused 8 (delta 7), pack-reused 0 (from 0)
+Unpacking objects: 100% (8/8), 1.14 KiB | 290.00 KiB/s, done.
+From https://github.com/trpl333/LeadFlowTracker
+ * branch            main       -> FETCH_HEAD
+   e4914af..3c97026  main       -> origin/main
+Updating e4914af..3c97026
+Fast-forward
+ .replit           | 4 ++++
+ server/db.ts      | 2 +-
+ server/storage.ts | 4 ++--
+ 3 files changed, 7 insertions(+), 3 deletions(-)
+
+> rest-express@1.0.0 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+
+vite v5.4.20 building for production...
+transforming (3) src/main.tsxBrowserslist: browsers data (caniuse-lite) is 12 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 2670 modules transformed.
+../dist/public/index.html                   0.94 kB │ gzip:   0.52 kB
+../dist/public/assets/index-C9Q9JJy-.css   75.05 kB │ gzip:  12.00 kB
+../dist/public/assets/index-DSap9Pzk.js   559.52 kB │ gzip: 171.37 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 11.48s
+
+  dist/index.js  21.7kb
+
+⚡ Done in 9ms
+🔧 Fixing production build...
+✅ Fixed! Starting app...
+[PM2] Applying action restartProcessId on app [leadflow-tracker](ids: [ 0 ])
+[PM2] [leadflow-tracker](0) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ leadflow-tracker   │ cluster  │ 2    │ online    │ 0%       │ 40.4mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[TAILING] Tailing last 20 lines for [leadflow-tracker] process (change the value with --lines option)
+/var/log/leadflow/error-0.log last 20 lines:
+/var/log/leadflow/out-0.log last 20 lines:
+0|leadflow | 2025-10-21T00:56:59: 
+0|leadflow | > rest-express@1.0.0 start
+0|leadflow | > NODE_ENV=production node dist/index.js
+0|leadflow | 
+0|leadflow | 2025-10-21T01:06:25: 
+0|leadflow | > rest-express@1.0.0 start
+0|leadflow | > NODE_ENV=production node dist/index.js
+0|leadflow | 
+0|leadflow | 2025-10-21T17:02:37: 
+0|leadflow | > rest-express@1.0.0 start
+0|leadflow | > NODE_ENV=production node dist/index.js
+0|leadflow | 
+
